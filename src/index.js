@@ -8,15 +8,14 @@ import morgan from "morgan";
 
 const app = express();
 
-/* ------------------ TRUST PROXY ------------------ */
-/* Required when running behind Apache / Nginx */
-app.set("trust proxy", true);
+/* TRUST APACHE PROXY */
+app.set("trust proxy", 1);
 
-/* ------------------ MIDDLEWARE ------------------ */
+/* MIDDLEWARE */
 app.use(morgan("dev"));
 app.use(express.json());
 
-/* ------------------ CORS CONFIG ------------------ */
+/* CORS */
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(",")
   : [];
@@ -27,46 +26,28 @@ app.use(
       if (!origin) return callback(null, true);
 
       if (!allowedOrigins.includes(origin)) {
-        return callback(
-          new Error(`CORS not allowed for ${origin}`),
-          false
-        );
+        return callback(new Error(`CORS not allowed for ${origin}`), false);
       }
 
       return callback(null, true);
     },
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    credentials: true,
   })
 );
 
-/* ------------------ RATE LIMIT ------------------ */
+/* RATE LIMIT */
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 15 * 60 * 1000,
   max: 20,
   standardHeaders: true,
   legacyHeaders: false,
-  message: {
-    success: false,
-    message: "Too many requests, please try again later",
-  },
 });
 
-/* Apply limiter only to API routes */
 app.use("/api", limiter);
 
-/* ------------------ ROUTES ------------------ */
+/* ROUTES */
 app.use(routes);
 
-/* ------------------ HEALTH CHECK ------------------ */
-app.get("/", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "Payment Service Running",
-  });
-});
-
-/* ------------------ SERVER ------------------ */
+/* SERVER */
 const PORT = process.env.PORT || 8005;
 
 app.listen(PORT, () => {
