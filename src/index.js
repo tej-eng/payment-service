@@ -7,6 +7,7 @@ import rateLimit from "express-rate-limit";
 import morgan from "morgan";
 
 const app = express();
+app.set("trust proxy", 1);
 app.use(morgan("dev"));
 app.use(express.json());
 
