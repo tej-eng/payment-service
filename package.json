@@ -1,6 +1,7 @@
 {
   "name": "payment-service",
   "version": "1.0.0",
+   "type": "module",
   "description": "Razorpay payment service for Dhwani Astro",
   "main": "src/index.js",
   "scripts": {
